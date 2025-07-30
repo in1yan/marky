@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "easymde": "^2.20.0",
+    "marked": "^16.1.1"
+  }
+}
