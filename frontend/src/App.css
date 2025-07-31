@@ -37,3 +37,13 @@ html, body {
 .EasyMDEContainer .editor-toolbar {
   border: none !important;
 }
+.editor-preview code,
+.editor-preview-side code {
+  background-color: #2a273f;
+  padding: 1rem;
+  border-radius: 5px;
+  font-family: 'Fira Code', monospace;
+  font-size: 14px;
+  display: block;
+  overflow-x: auto;
+}

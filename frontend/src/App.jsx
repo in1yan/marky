@@ -5,9 +5,24 @@ import EasyMDE from 'easymde';
 import 'easymde/dist/easymde.min.css';
 import { marked } from 'marked';
 import {toast, ToastContainer} from 'react-toastify';
-import DOMPurify from 'dompurify'; // Optional: for sanitizing HTML
-import { Open , Save} from '../wailsjs/go/main/App.js'; // Import Open function from Wails app
+import DOMPurify from 'dompurify'; 
+import { Open , Save} from '../wailsjs/go/main/App.js'; 
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github-dark.css'; // Import a highlight.js theme
 
+marked.setOptions({
+  highlight: function (code, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return hljs.highlight(code, { language: lang }).value;
+      } catch (err) {
+        console.error('Highlighting error:', err);
+      }
+    }
+    return hljs.highlightAuto(code).value;
+  },
+  langPrefix: 'hljs language-',
+});
 function App() {
   const textareaRef = useRef(null);
   const mde = useRef(null);
@@ -43,7 +58,7 @@ function App() {
             name: "save",
             action: (editor) => {
               const content = editor.value();
-              Save(content); // Call Save function from Wails app
+              Save(content);
               toast.success('File saved');
             },
             className: "fa fa-save",
@@ -53,17 +68,48 @@ function App() {
           'preview', 'side-by-side', 'fullscreen'
         ],
         initialValue: fileContent,
-        renderingConfig:{
-          codeSyntaxHighlighting: true
+        renderingConfig: {
+          codeSyntaxHighlighting: true,
+          markedOptions: {
+            highlight: function (code, lang) {
+              if (lang && hljs.getLanguage(lang)) {
+                try {
+                  return hljs.highlight(code, { language: lang }).value;
+                } catch (err) {
+                  console.error('Highlighting error:', err);
+                }
+              }
+              return hljs.highlightAuto(code).value;
+            }
+          }
+        },
+        previewRender: function(plainText) {
+          return marked.parse(plainText);
         }
       });
 
-      // Listen to editor changes and update preview
-      mde.current.codemirror.on('change', () => {
-        const rawMarkdown = mde.current.value();
-        const html = marked.parse(rawMarkdown);
-        setPreviewHTML(DOMPurify.sanitize(html)); // secure HTML output
+      // Set up MutationObserver to watch for preview changes
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'childList') {
+            const previewElement = document.querySelector('.editor-preview, .editor-preview-side');
+            if (previewElement) {
+              previewElement.querySelectorAll('pre code:not(.hljs)').forEach((block) => {
+                hljs.highlightElement(block);
+              });
+            }
+          }
+        });
       });
+
+      // Start observing changes to the document body
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+
+      // Store observer reference for cleanup
+      mde.current.observer = observer;
 
       // Set initial preview
       const initialHTML = marked.parse(mde.current.value());
@@ -72,6 +118,10 @@ function App() {
 
     return () => {
       if (mde.current) {
+        // Clean up observer
+        if (mde.current.observer) {
+          mde.current.observer.disconnect();
+        }
         mde.current.toTextArea();
         mde.current = null;
       }
@@ -80,7 +130,7 @@ function App() {
 
   return (
     <div id="App" style={{ width: '100vw', height: '100vh', margin: 0, padding: 0 }}>
-      <textarea style={{ width: '100%', height: '100%', padding: '1rem', border: 'none', outline: 'none', resize: 'none', fontFamily: 'monospace', fontSize: '14px' }} ref={textareaRef} />
+      <textarea style={{ width: '100%', height: '100%', padding: '1rem', border: 'none', outline: 'none', resize: 'none', fontFamily: 'monospace', fontSize: '15px' }} ref={textareaRef} />
       <ToastContainer autoClose={1000} hideProgressBar={true} theme='dark'/>
     </div>
   );
