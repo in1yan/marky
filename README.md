@@ -1,19 +1,65 @@
-# README
 
-## About
 
-This is the official Wails React template.
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+# ✨ Marky
 
-## Live Development
+Marky is a minimal Markdown editor built with:
 
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
+- ⚙️ **Wails** for the Go backend
+- ⚛️ **React** for the frontend
+- 📝 **EasyMDE** for the editor experience
+- 🌈 **Highlight.js** for syntax highlighting
+- 💾 File I/O via Wails bindings
 
-## Building
 
-To build a redistributable, production mode package, use `wails build`.
+---
+
+## 🚀 Features
+
+- 📄 Load & save `.md` files from the command line.
+- 🎯 Live preview of rendered markdown
+- 🧠 Syntax highlighting for code blocks
+- 🧘‍♂️ Vim keybindings via EasyMDE
+- 🔥 Minimal, fullscreen editor layout
+
+---
+
+## 🛠️ Setup & Run
+
+### 1. Clone the project
+
+```bash
+git clone https://github.com/in1yan/marky.git
+cd marky
+````
+
+### 2. Install Go dependencies
+
+```bash
+go mod tidy
+```
+
+### 3. Install frontend dependencies
+
+```bash
+cd frontend
+npm install
+```
+
+### 4. Run in development mode
+
+```bash
+# From root
+wails dev
+```
+
+---
+
+## 📦 Build for production
+
+```bash
+wails build
+```
+
+---
+
